@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이상한 나라의 앨리스 방탈출</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+            background-color: #fce7f3; /* 연한 핑크 배경 (이상한 나라 느낌) */
+        }
+        .alice-card {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border: 2px solid #ec4899; /* 핑크색 테두리 */
+        }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- 1. 로그인/정보 입력 화면 -->
+    <div id="login-screen" class="alice-card w-full max-w-md p-8 text-center">
+        <h1 class="text-3xl font-bold text-pink-600 mb-2">이상한 나라로의 초대</h1>
+        <p class="text-gray-600 mb-4">새로운 앨리스, 당신의 이름을 알려주세요!</p>
+        
+        <!-- 파이어베이스 연결 상태 표시 배지 -->
+        <div id="db-status-badge" class="mb-4 inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 border border-gray-200">
+            <span class="w-2 h-2 rounded-full bg-gray-400 mr-2" id="status-dot"></span>
+            <span id="status-text">저장소 연결 확인 중...</span>
+        </div>
+
+        <input type="text" id="user-name" placeholder="이름 (또는 닉네임)" class="w-full px-4 py-3 rounded-lg border-2 border-pink-200 focus:border-pink-500 focus:outline-none mb-4 transition-colors">
+        <input type="tel" id="user-phone" placeholder="연락처 (선택, 이벤트 당첨용)" class="w-full px-4 py-3 rounded-lg border-2 border-pink-200 focus:border-pink-500 focus:outline-none mb-6 transition-colors">
+        
+        <button onclick="startGame()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-4 rounded-lg transition-colors shadow-md">
+            토끼 굴로 뛰어들기
+        </button>
+
+        <div class="mt-8 pt-4 border-t border-gray-200 flex justify-between items-center text-xs text-gray-400">
+            <button onclick="showAdminLogin()" class="hover:text-pink-500 underline">관리자 페이지</button>
+            <button onclick="showConfigModal()" class="hover:text-pink-500 underline">🔥 Firebase 키 설정</button>
+        </div>
+    </div>
+
+    <!-- 2. 게임 메인 화면 (방문자) -->
+    <div id="game-screen" class="alice-card w-full max-w-md p-8 text-center hidden">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold text-pink-600">Stage 1. 모자 장수의 티파티</h2>
+            <span id="player-name-display" class="text-sm font-semibold bg-pink-100 text-pink-800 py-1 px-3 rounded-full"></span>
+        </div>
+
+        <div class="bg-gray-50 rounded-lg p-6 mb-6 text-left border border-gray-200">
+            <p class="text-gray-800 leading-relaxed italic mb-4">
+                "시간의 개념을 잃고 영원히 차를 마시는 모자 장수. 그를 도와 차(Tea)의 비율을 맞춰야 합니다."
+            </p>
+            <div class="bg-white p-4 rounded border-l-4 border-pink-500 shadow-sm">
+                <p class="font-bold text-gray-700 mb-2">🎩 퍼즐 미션:</p>
+                <p class="text-sm text-gray-600">이 공원(축제장 중앙)에 있는 <strong class="text-pink-600">빨간색 벤치의 수</strong>를 세어보세요!</p>
+            </div>
+        </div>
+
+        <input type="number" id="answer-input" placeholder="정답을 숫자로 입력하세요" class="w-full px-4 py-3 rounded-lg border-2 border-pink-200 focus:border-pink-500 focus:outline-none mb-4 text-center text-lg">
+        
+        <button onclick="checkAnswer()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition-colors shadow-md">
+            정답 확인하기
+        </button>
+
+        <p id="game-message" class="mt-4 text-sm font-semibold h-4"></p>
+    </div>
+
+    <!-- 3. 관리자 로그인 화면 -->
+    <div id="admin-login-screen" class="alice-card w-full max-w-md p-8 text-center hidden">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">하트 여왕의 비밀 정원 (관리자)</h2>
+        <input type="password" id="admin-pw" placeholder="비밀번호를 입력하세요 (기본: 1234)" class="w-full px-4 py-3 rounded-lg border-2 border-gray-300 focus:border-gray-500 focus:outline-none mb-4 text-center">
+        <button onclick="loginAdmin()" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 px-4 rounded-lg transition-colors">
+            입장하기
+        </button>
+        <button onclick="showLoginScreen()" class="mt-4 text-sm text-gray-500 hover:text-gray-700 underline">돌아가기</button>
+    </div>
+
+    <!-- 4. 관리자 대시보드 화면 -->
+    <div id="admin-dashboard" class="alice-card w-full max-w-2xl p-8 hidden">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">참여자 현황</h2>
+            <button onclick="showLoginScreen()" class="text-sm bg-gray-200 hover:bg-gray-300 text-gray-800 py-1 px-3 rounded transition-colors">홈으로</button>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white border border-gray-200">
+                <thead>
+                    <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
+                        <th class="py-3 px-6 text-left">이름</th>
+                        <th class="py-3 px-6 text-left">연락처</th>
+                        <th class="py-3 px-6 text-center">현재 스테이지</th>
+                        <th class="py-3 px-6 text-center">참여 시간</th>
+                    </tr>
+                </thead>
+                <tbody id="participant-list" class="text-gray-600 text-sm font-light">
+                    <!-- 데이터가 여기에 동적으로 추가됩니다. -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="mt-6 flex justify-end">
+            <button onclick="clearData()" class="text-sm text-red-500 hover:text-red-700 font-semibold">데이터 초기화 (주의)</button>
+        </div>
+    </div>
+
+    <!-- 커스텀 알림/확인 모달 (alert / confirm 대체) -->
+    <div id="custom-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl border-2 border-pink-300 text-center transform transition-all scale-100">
+            <h3 id="modal-title" class="text-xl font-bold text-pink-600 mb-3">알림</h3>
+            <p id="modal-message" class="text-gray-700 mb-6 text-sm whitespace-pre-line"></p>
+            <div class="flex justify-center gap-3" id="modal-buttons">
+                <button id="modal-ok-btn" class="bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-6 rounded-lg transition-colors">확인</button>
+                <button id="modal-cancel-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-6 rounded-lg transition-colors hidden">취소</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase 키 안내 모달 -->
+    <div id="config-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border-2 border-pink-300 text-left">
+            <h3 class="text-xl font-bold text-pink-600 mb-2">🔥 Firebase 연동 방법 안내</h3>
+            <p class="text-xs text-gray-600 mb-4">소스코드의 <code class="bg-gray-100 px-1 py-0.5 rounded text-pink-600 font-mono">customFirebaseConfig</code> 변수에 발급받으신 파이어베이스 정보 키를 넣어주시면 자동으로 실시간 데이터베이스(Firestore) 모드로 동작합니다.</p>
+            
+            <div class="bg-gray-900 text-gray-200 p-3 rounded-lg text-xs font-mono mb-4 overflow-x-auto">
+<pre>const customFirebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};</pre>
+            </div>
+            <p class="text-xs text-pink-600 mb-4">※ 키를 설정하지 않더라도 브라우저 로컬 저장소(localStorage) 모드로 즉시 테스트할 수 있습니다.</p>
+            <button onclick="closeConfigModal()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 rounded-lg transition-colors">확인</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, deleteDoc, collection, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // ============================================================================
+        // 🔥 [파이어베이스 연동 설정 완료]
+        // ============================================================================
+        const customFirebaseConfig = {
+            apiKey: "AIzaSyCC3MibeBD9bVHKnGvJfknROH1wUn2DswI",
+            authDomain: "alice-cab96.firebaseapp.com",
+            projectId: "alice-cab96",
+            storageBucket: "alice-cab96.firebasestorage.app",
+            messagingSenderId: "859163920884",
+            appId: "1:859163920884:web:a54e2cf1e8ba09f82591a1",
+            measurementId: "G-F6HKQVWF4P"
+        };
+
+        // 전역 환경변수 지정 시 사용, 없을 경우 사용자 입력 customFirebaseConfig 참조
+        const firebaseConfig = typeof __firebase_config !== 'undefined' 
+            ? JSON.parse(__firebase_config) 
+            : customFirebaseConfig;
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'alice-escape-game';
+
+        let app, auth, db;
+        let isFirebaseActive = false;
+        let currentUserAuth = null;
+        let unsubscribeParticipants = null;
+
+        const screens = ['login-screen', 'game-screen', 'admin-login-screen', 'admin-dashboard'];
+        const correctAnswer = "5";
+        const adminPassword = "1234";
+
+        async function initFirebase() {
+            if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY") {
+                try {
+                    app = initializeApp(firebaseConfig);
+                    auth = getAuth(app);
+                    db = getFirestore(app);
+
+                    // 인증 처리 (커스텀 토큰 우선 사용, 없으면 익명 로그인)
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        const userCred = await signInWithCustomToken(auth, __initial_auth_token);
+                        currentUserAuth = userCred.user;
+                    } else {
+                        const userCred = await signInAnonymously(auth);
+                        currentUserAuth = userCred.user;
+                    }
+
+                    isFirebaseActive = true;
+                    updateBadgeStatus('firebase');
+                } catch (err) {
+                    console.warn("Firebase 연결 오류. 로컬 저장소 모드로 작동합니다:", err);
+                    isFirebaseActive = false;
+                    updateBadgeStatus('local');
+                }
+            } else {
+                isFirebaseActive = false;
+                updateBadgeStatus('local');
+            }
+        }
+
+        function updateBadgeStatus(mode) {
+            const dot = document.getElementById('status-dot');
+            const text = document.getElementById('status-text');
+            const badge = document.getElementById('db-status-badge');
+
+            if (mode === 'firebase') {
+                dot.className = "w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse";
+                text.innerText = "Firebase 실시간 연동 완료";
+                badge.className = "mb-4 inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700 border border-green-200";
+            } else {
+                dot.className = "w-2 h-2 rounded-full bg-amber-500 mr-2";
+                text.innerText = "로컬 저장소 모드";
+                badge.className = "mb-4 inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200";
+            }
+        }
+
+        // UI 알림창 (alert 대체)
+        window.showAlert = function(message, title = "알림", callback = null) {
+            const modal = document.getElementById('custom-modal');
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-message').innerText = message;
+            
+            const okBtn = document.getElementById('modal-ok-btn');
+            const cancelBtn = document.getElementById('modal-cancel-btn');
+            
+            cancelBtn.classList.add('hidden');
+            
+            const handleOk = () => {
+                modal.classList.add('hidden');
+                okBtn.removeEventListener('click', handleOk);
+                if (callback) callback();
+            };
+            
+            okBtn.onclick = handleOk;
+            modal.classList.remove('hidden');
+        };
+
+        // UI 확인창 (confirm 대체)
+        window.showConfirm = function(message, onConfirm, title = "확인") {
+            const modal = document.getElementById('custom-modal');
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-message').innerText = message;
+            
+            const okBtn = document.getElementById('modal-ok-btn');
+            const cancelBtn = document.getElementById('modal-cancel-btn');
+            
+            cancelBtn.classList.remove('hidden');
+            
+            const handleOk = () => {
+                modal.classList.add('hidden');
+                cleanup();
+                onConfirm();
+            };
+            
+            const handleCancel = () => {
+                modal.classList.add('hidden');
+                cleanup();
+            };
+
+            const cleanup = () => {
+                okBtn.removeEventListener('click', handleOk);
+                cancelBtn.removeEventListener('click', handleCancel);
+            };
+
+            okBtn.onclick = handleOk;
+            cancelBtn.onclick = handleCancel;
+            modal.classList.remove('hidden');
+        };
+
+        window.showConfigModal = function() {
+            document.getElementById('config-modal').classList.remove('hidden');
+        };
+
+        window.closeConfigModal = function() {
+            document.getElementById('config-modal').classList.add('hidden');
+        };
+
+        window.showScreen = function(screenId) {
+            screens.forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(screenId).classList.remove('hidden');
+        };
+
+        // 사용자 데이터 저장
+        async function saveParticipantData(userData) {
+            // 로컬 스토리지 업데이트
+            let localData = JSON.parse(localStorage.getItem('alice_participants')) || [];
+            const idx = localData.findIndex(p => p.name === userData.name);
+            if (idx === -1) {
+                localData.push(userData);
+            } else {
+                localData[idx] = { ...localData[idx], ...userData };
+            }
+            localStorage.setItem('alice_participants', JSON.stringify(localData));
+
+            // 파이어베이스 Firestore 저장 (RULE 1 경로 적용)
+            if (isFirebaseActive && db && currentUserAuth) {
+                try {
+                    const docId = encodeURIComponent(userData.name);
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'alice_participants', docId);
+                    await setDoc(docRef, userData, { merge: true });
+                } catch (e) {
+                    console.error("Firestore 데이터 저장 에러:", e);
+                }
+            }
+        }
+
+        // 게임 시작
+        window.startGame = async function() {
+            const name = document.getElementById('user-name').value.trim();
+            const phone = document.getElementById('user-phone').value.trim();
+
+            if (!name) {
+                showAlert('이름을 입력해주세요!', '안내');
+                return;
+            }
+
+            const userData = {
+                name: name,
+                phone: phone,
+                stage: 1,
+                startTime: new Date().toLocaleString()
+            };
+
+            await saveParticipantData(userData);
+            sessionStorage.setItem('alice_current_user', name);
+
+            document.getElementById('player-name-display').innerText = name;
+            showScreen('game-screen');
+        };
+
+        // 정답 확인
+        window.checkAnswer = async function() {
+            const input = document.getElementById('answer-input').value.trim();
+            const messageEl = document.getElementById('game-message');
+            const currentUser = sessionStorage.getItem('alice_current_user');
+
+            if (input === correctAnswer) {
+                messageEl.innerText = "정답입니다! 다음 장소로 이동하세요. (데모 버전은 여기까지입니다.)";
+                messageEl.className = "mt-4 text-sm font-semibold h-4 text-green-600";
+                
+                if (currentUser) {
+                    await saveParticipantData({
+                        name: currentUser,
+                        stage: 2
+                    });
+                }
+
+                setTimeout(() => {
+                    showAlert("축하합니다! 시계 부품을 찾았습니다.\n(실제 앱에서는 여기서 Stage 2 화면으로 넘어갑니다.)", "🎉 축하합니다!");
+                }, 300);
+
+            } else {
+                messageEl.innerText = "틀렸습니다. 다시 한번 잘 세어보세요!";
+                messageEl.className = "mt-4 text-sm font-semibold h-4 text-red-500";
+                
+                const inputEl = document.getElementById('answer-input');
+                inputEl.classList.add('animate-pulse', 'border-red-500');
+                setTimeout(() => {
+                    inputEl.classList.remove('animate-pulse', 'border-red-500');
+                }, 1000);
+            }
+        };
+
+        window.showAdminLogin = function() {
+            showScreen('admin-login-screen');
+        };
+
+        window.showLoginScreen = function() {
+            if (unsubscribeParticipants) {
+                unsubscribeParticipants();
+                unsubscribeParticipants = null;
+            }
+            showScreen('login-screen');
+        };
+
+        window.loginAdmin = function() {
+            const pw = document.getElementById('admin-pw').value;
+            if (pw === adminPassword) {
+                document.getElementById('admin-pw').value = '';
+                loadAdminDashboard();
+                showScreen('admin-dashboard');
+            } else {
+                showAlert("비밀번호가 틀렸습니다.", "인증 실패");
+            }
+        };
+
+        function loadAdminDashboard() {
+            const tbody = document.getElementById('participant-list');
+            
+            // 파이어베이스 실시간 수신 구독
+            if (isFirebaseActive && db && currentUserAuth) {
+                const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'alice_participants');
+                
+                // 단순 쿼리 및 메모리 정렬 (RULE 2 준수)
+                unsubscribeParticipants = onSnapshot(colRef, (snapshot) => {
+                    const participants = [];
+                    snapshot.forEach(doc => {
+                        participants.push(doc.data());
+                    });
+                    renderTable(participants);
+                }, (err) => {
+                    console.error("실시간 참여자 불러오기 실패:", err);
+                    loadFromLocalStorage();
+                });
+            } else {
+                loadFromLocalStorage();
+            }
+
+            function loadFromLocalStorage() {
+                const participants = JSON.parse(localStorage.getItem('alice_participants')) || [];
+                renderTable(participants);
+            }
+
+            function renderTable(participants) {
+                tbody.innerHTML = '';
+                if (!participants || participants.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-gray-500">아직 참여자가 없습니다.</td></tr>`;
+                    return;
+                }
+
+                // 최신순 정렬
+                const sorted = [...participants].reverse();
+                sorted.forEach(p => {
+                    const tr = document.createElement('tr');
+                    tr.className = "border-b border-gray-200 hover:bg-gray-50";
+                    
+                    const stageColor = p.stage === 1 ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700';
+                    const stageText = p.stage === 1 ? '진행 중' : 'Stage 1 통과';
+
+                    tr.innerHTML = `
+                        <td class="py-3 px-6 text-left whitespace-nowrap"><span class="font-medium">${p.name || '-'}</span></td>
+                        <td class="py-3 px-6 text-left">${p.phone || '-'}</td>
+                        <td class="py-3 px-6 text-center"><span class="${stageColor} py-1 px-3 rounded-full text-xs">${stageText}</span></td>
+                        <td class="py-3 px-6 text-center text-xs text-gray-500">${p.startTime || '-'}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+        }
+
+        window.clearData = function() {
+            showConfirm("모든 참여자 데이터를 정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.", async () => {
+                localStorage.removeItem('alice_participants');
+                
+                if (isFirebaseActive && db && currentUserAuth) {
+                    try {
+                        const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'alice_participants');
+                        const snapshot = await getDocs(colRef);
+                        const deletePromises = snapshot.docs.map(docSnapshot => deleteDoc(docSnapshot.ref));
+                        await Promise.all(deletePromises);
+                    } catch (e) {
+                        console.error("파이어베이스 데이터 초기화 실패:", e);
+                    }
+                }
+                loadAdminDashboard();
+                showAlert("데이터가 성공적으로 초기화되었습니다.", "완료");
+            }, "데이터 초기화 경고");
+        };
+
+        // 앱 시작 시 파이어베이스 초기화 실행
+        window.addEventListener('DOMContentLoaded', () => {
+            initFirebase();
+            showScreen('login-screen');
+        });
+    </script>
+</body>
+</html>
