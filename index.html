@@ -16,9 +16,6 @@
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // ==========================================
-        // 🔑 사용자 본인의 파이어베이스 키를 여기에 입력하세요!
-        // ==========================================
         const userFirebaseConfig = {
             apiKey: "AIzaSyCC3MibeBD9bVHKnGvJfknROH1wUn2DswI",
             authDomain: "alice-cab96.firebaseapp.com",
@@ -29,35 +26,28 @@
             measurementId: "G-F6HKQVWF4P"
         };
 
-        // 파이어베이스 초기화 및 전역 등록
         let db = null;
         let auth = null;
         try {
-            // 키가 기본값이 아닐 때만 초기화 진행
             if (userFirebaseConfig.apiKey !== "YOUR_API_KEY_HERE") {
                 const app = initializeApp(userFirebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
                 
-                // 익명 인증 수행 및 에러 핸들링 추가
                 const token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
                 if (token) {
                     signInWithCustomToken(auth, token).catch((e) => {
                         console.warn("커스텀 토큰 인증 실패, 익명 인증으로 시도합니다:", e);
-                        signInAnonymously(auth).catch(err => console.warn("익명 인증 실패 (Firebase Console에서 익명 인증 활성화가 필요할 수 있습니다):", err));
+                        signInAnonymously(auth).catch(err => console.warn("익명 인증 실패:", err));
                     });
                 } else {
-                    signInAnonymously(auth).catch(err => console.warn("익명 인증 실패 (Firebase Console에서 익명 인증 활성화가 필요할 수 있습니다):", err));
+                    signInAnonymously(auth).catch(err => console.warn("익명 인증 실패:", err));
                 }
-                console.log("커스텀 파이어베이스가 연결되었습니다.");
-            } else {
-                console.log("기본 파이어베이스 설정이 입력되지 않아 로컬 스토리지 모드로 동작합니다.");
             }
         } catch(e) {
-            console.warn("파이어베이스 초기화 중 오류가 발생했습니다:", e);
+            console.warn("파이어베이스 초기화 오류:", e);
         }
 
-        // 전역으로 함수 공유
         window.firebaseDb = () => db;
         window.firebaseAuth = () => auth;
         window.firebaseAddDoc = addDoc;
@@ -66,7 +56,6 @@
     </script>
 
     <style>
-        /* 기본 폰트 설정 */
         body { 
             font-family: 'Jua', sans-serif; 
             background-color: #1e1b4b; 
@@ -74,12 +63,10 @@
         .font-sans { 
             font-family: 'Noto Sans KR', sans-serif; 
         }
-        /* 손글씨 폰트 */
         .font-handwriting {
             font-family: 'Nanum Pen Script', cursive;
         }
         
-        /* 실루엣 효과 */
         .silhouette {
             filter: brightness(0);
             opacity: 0.9;
@@ -90,7 +77,6 @@
             opacity: 1;
         }
 
-        /* 애니메이션 모음 */
         @keyframes bounce-subtle {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
@@ -105,14 +91,12 @@
         }
         .animate-float { animation: float-around 4s infinite ease-in-out; }
 
-        /* 돋보기 떠다니는 애니메이션 */
         @keyframes hover-mag { 
             0%, 100% { transform: translateY(0) rotate(-10deg); } 
             50% { transform: translateY(-12px) rotate(10deg); } 
         }
         .mag-glass-anim { animation: hover-mag 2s infinite ease-in-out; }
 
-        /* 화면 전환 페이드인 */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -121,7 +105,6 @@
             animation: fadeIn 0.4s ease-out forwards;
         }
 
-        /* 모달 팝업/아웃 애니메이션 */
         @keyframes modalEnter {
             from { opacity: 0; transform: scale(0.8) translateY(20px); }
             to { opacity: 1; transform: scale(1) translateY(0); }
@@ -139,20 +122,17 @@
         }
         .timer-warning { animation: pulse-red 1s infinite; }
 
-        /* Number Input 스피너 숨기기 */
         input[type="number"]::-webkit-inner-spin-button,
         input[type="number"]::-webkit-outer-spin-button {
             -webkit-appearance: none;
             margin: 0;
         }
         input[type="number"] {
-            -moz-appearance: textfield; /* Firefox */
+            -moz-appearance: textfield;
         }
 
-        /* 커스텀 스크롤바 감추기 */
         ::-webkit-scrollbar { display: none; }
         
-        /* 모바일 전용 래퍼 */
         .app-container {
             max-width: 480px;
             margin: 0 auto;
@@ -164,7 +144,6 @@
             background-attachment: fixed;
         }
 
-        /* 화면 전환용 유틸리티 */
         .screen-section {
             display: none;
             min-height: 100vh;
@@ -174,27 +153,24 @@
             display: flex;
         }
         
-        /* 이미지 아이콘 스타일 */
         .npc-icon {
-            width: 3rem; /* 48px */
+            width: 3rem;
             height: 3rem;
             object-fit: cover;
         }
         
         .npc-icon-large {
-            width: 5rem; /* 80px */
+            width: 5rem;
             height: 5rem;
             object-fit: contain;
         }
 
-        /* 탐정 보드 (코르크 보드) 배경 */
         .corkboard {
             background-color: #926339;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.25'/%3E%3C/svg%3E");
             box-shadow: inset 0 0 60px rgba(0,0,0,0.8);
         }
 
-        /* 수배지/폴라로이드 디자인 */
         .polaroid {
             background: #fdfbf7;
             box-shadow: 2px 6px 12px rgba(0,0,0,0.4);
@@ -202,7 +178,6 @@
             position: relative;
         }
 
-        /* 보드 핀 */
         .board-pin {
             width: 14px;
             height: 14px;
@@ -216,7 +191,6 @@
             z-index: 30;
         }
 
-        /* 테이프 장식 */
         .tape {
             position: absolute;
             background-color: rgba(255, 255, 200, 0.4);
@@ -226,7 +200,6 @@
             border-right: 1px dashed rgba(0,0,0,0.1);
         }
 
-        /* 검거(ARRESTED) 스탬프 */
         .stamp-cleared {
             color: #dc2626;
             border: 4px solid #dc2626;
@@ -242,7 +215,6 @@
             mix-blend-mode: multiply;
         }
 
-        /* 관리자 탭 스타일 */
         .admin-tab { border-bottom: 2px solid transparent; }
         .admin-tab.active {
             border-bottom: 2px solid #9333ea;
@@ -250,7 +222,6 @@
             font-weight: bold;
         }
         
-        /* 라디오 버튼 커스텀 */
         .custom-radio:checked + label {
             background-color: #9333ea;
             color: white;
@@ -264,8 +235,8 @@
         <section id="screen-entry" class="screen-section active p-6 bg-white justify-center screen-fade-in">
             <div class="text-center mb-8">
                 <div class="text-6xl mb-4 animate-bounce-subtle">🕵️‍♂️</div>
-                <h1 class="text-2xl font-bold text-purple-900 mb-2 leading-tight" id="entry-title">이상한 나라의<br>이 상한 탐정은<br>충치를 치료하고 싶습니다</h1>
-                <p class="text-gray-500 font-sans text-sm mt-3">사라진 지갑을 훔친 범인을 찾아라!</p>
+                <h1 class="text-2xl font-bold text-purple-900 mb-2 leading-tight break-keep" id="entry-title">이상한 나라의<br>이 상한 탐정은<br>충치를 치료하고 싶습니다</h1>
+                <p class="text-gray-500 font-sans text-sm mt-3 break-keep">사라진 지갑을 훔친 범인을 찾아라!</p>
             </div>
             
             <form id="entry-form" class="bg-gray-50 p-6 rounded-3xl shadow-lg border border-gray-100 font-sans space-y-5">
@@ -321,15 +292,14 @@
             <div class="p-6 text-center pt-12 flex-grow">
                 <h2 class="text-3xl font-bold text-purple-900 mb-6 leading-tight break-keep">사건 발생!<br>지갑을 찾아라!</h2>
                 
-                <!-- 지갑 이모지로 교체 -->
                 <div class="bg-white p-8 rounded-full shadow-[0_10px_30px_rgba(147,51,234,0.2)] border-4 border-purple-200 mb-8 max-w-[200px] mx-auto flex items-center justify-center animate-bounce-subtle">
                     <span class="text-8xl">👛</span>
                 </div>
                 
                 <div class="font-sans text-gray-700 leading-relaxed text-sm bg-purple-50 p-5 rounded-2xl border border-purple-100 shadow-sm break-keep">
                     <p class="mb-3 font-bold text-purple-800"><span id="intro-nickname" class="text-lg">탐정</span>님, 사건입니다!</p>
-                    <p class="break-keep">앨리스의 지갑을 찾아야 합니다!<br>지갑을 찾아 탐정이 치료비를 받을 수 있도록<br>도와주세요!</p>
-                    <p class="mt-4 text-red-500 font-bold"><i class="fa-regular fa-clock"></i> 제한 시간 안에<br>용의자들을 모두 수색해야 합니다.</p>
+                    <p class="break-keep leading-snug">앨리스의 지갑을 찾아야 합니다!<br>지갑을 찾아 탐정이 치료비를 받을 수 있도록 도와주세요!</p>
+                    <p class="mt-4 text-red-500 font-bold leading-snug"><i class="fa-regular fa-clock"></i> 제한 시간 안에<br>용의자들을 모두 수색해야 합니다.</p>
                 </div>
             </div>
             
@@ -343,7 +313,6 @@
         <!-- 3. 메인 지도(수사 보드) 페이지 -->
         <section id="screen-map" class="screen-section bg-[#1a1a1a]">
             <header class="bg-[#262626] border-b-4 border-red-800 p-4 sticky top-0 z-50 shadow-[0_4px_12px_rgba(0,0,0,0.6)]">
-                <!-- 타이머 영역 -->
                 <div class="flex flex-col items-center justify-center">
                     <span class="text-[11px] text-gray-400 font-bold mb-1 tracking-widest font-sans">제한 시간</span>
                     <div class="bg-black text-red-500 border border-red-900 rounded-lg py-2 px-6 flex items-center justify-center gap-3 shadow-inner font-sans font-bold tracking-[0.2em] w-full max-w-[240px]">
@@ -356,57 +325,32 @@
             <main class="flex-grow p-6 relative corkboard pb-28 overflow-hidden" id="map-container">
                 <svg id="red-strings-svg" class="absolute inset-0 w-full h-full pointer-events-none z-0"></svg>
                 
-                <!-- 폴리스 라인 -->
                 <div class="absolute top-10 -left-10 bg-yellow-400 text-black font-extrabold text-xs py-1 px-40 transform -rotate-12 shadow-sm border-y-2 border-black z-0 pointer-events-none opacity-80 overflow-hidden whitespace-nowrap tracking-widest">
                     CRIME SCENE DO NOT CROSS CRIME SCENE DO NOT CROSS
                 </div>
 
-                <!-- 보드 장식물 1: 노란색 사건 파일 메모 -->
                 <div class="absolute top-16 right-4 bg-yellow-200 text-gray-800 p-2 text-[11px] transform -rotate-6 shadow-md font-sans font-bold w-32 z-30 border border-yellow-300 pointer-events-none transition hover:rotate-0 break-keep">
                     <div class="tape w-10 h-4 -top-2 left-1/2 transform -translate-x-1/2 rotate-3"></div>
                     🔍 지갑 도난 사건 용의자 파일
                 </div>
 
-                <!-- 보드 장식물 2: 신문 스크랩 -->
                 <div class="absolute top-[28%] left-2 bg-[#f4f1ea] p-3 text-black w-28 shadow-md transform rotate-3 font-sans border border-[#d1c9b4] z-30 pointer-events-none opacity-90">
                     <div class="tape w-10 h-4 -top-2 left-1/2 transform -translate-x-1/2 -rotate-2"></div>
                     <h4 class="font-bold border-b-2 border-black text-xs mb-1">일간 탐정</h4>
                     <p class="text-[9px] leading-tight text-gray-700 font-bold break-keep">"지갑 연쇄 도난 사건 발생!<br>시민들의 각별한 주의 요망..."</p>
                 </div>
 
-                <!-- 보드 장식물 3: 냅킨 메모 -->
                 <div class="absolute top-[45%] right-6 bg-white p-3 w-24 h-24 transform -rotate-12 shadow-md z-30 pointer-events-none opacity-90 rounded-sm">
                     <div class="board-pin" style="top: 4px; left: 10px;"></div>
                     <div class="absolute w-12 h-12 border-2 border-amber-800 rounded-full opacity-20 -top-2 -left-2"></div>
                     <p class="font-handwriting text-gray-800 text-2xl leading-tight mt-2 break-keep">알리바이<br>확인 필수!</p>
                 </div>
 
-                <!-- 보드 장식물 4: 손글씨 메모들 -->
                 <div class="absolute bottom-40 right-10 text-white font-handwriting text-4xl transform -rotate-12 z-30 opacity-80 pointer-events-none">
                     범인은 누구?!
                 </div>
                 <div class="absolute bottom-[24%] left-10 text-yellow-300 font-handwriting text-3xl transform rotate-[15deg] z-30 opacity-90 pointer-events-none break-keep text-center">
                     단서를<br>꼼꼼히<br>살펴보자!
-                </div>
-
-                <!-- 보드 장식물 5: 신문 스크랩 (분실물) -->
-                <div class="absolute top-[58%] left-1 bg-[#f4f1ea] p-2 text-black w-24 shadow-md transform -rotate-6 font-sans border border-[#d1c9b4] z-30 pointer-events-none opacity-85">
-                    <div class="tape w-8 h-3 -top-1 left-1/2 transform -translate-x-1/2 rotate-4"></div>
-                    <h4 class="font-bold border-b border-black text-[10px] mb-1">속보</h4>
-                    <p class="text-[8px] leading-tight text-gray-700 font-bold break-keep">"분실물 센터 연락 폭주! 잃어버린 지갑은 어디에?"</p>
-                </div>
-
-                <!-- 보드 장식물 6: 잡지 스크랩 (탐정) -->
-                <div class="absolute bottom-52 right-8 bg-pink-50 p-2 text-black w-28 shadow-md transform rotate-6 font-sans border border-pink-200 z-30 pointer-events-none opacity-90">
-                    <div class="tape w-8 h-4 -top-2 left-1/2 transform -translate-x-1/2 -rotate-3"></div>
-                    <p class="text-[9px] leading-tight text-pink-900 font-bold break-keep text-center">시흥에서 제일<br>잘 나가는 탐정 출격!</p>
-                </div>
-
-                <!-- 보드 장식물 7: 병원 영수증 -->
-                <div class="absolute top-[18%] right-6 bg-blue-50 p-2 text-black w-24 shadow-sm transform -rotate-12 font-sans border-t-2 border-dashed border-gray-400 z-30 pointer-events-none opacity-80">
-                    <div class="board-pin" style="top: -4px; left: 50%;"></div>
-                    <h4 class="font-bold text-[9px] mb-1 text-center text-blue-900">시흥치과 영수증</h4>
-                    <p class="text-[8px] leading-tight text-gray-700 font-bold break-keep">충치 치료비 폭등!<br><span class="text-red-600">지갑이 꼭 필요해!</span></p>
                 </div>
 
                 <div id="stages-wrapper" class="flex flex-col gap-10 relative z-10 py-6 mt-14"></div>
@@ -422,10 +366,8 @@
 
         <!-- 4. 힌트를 파헤쳐 보자! 페이지 -->
         <section id="screen-clues" class="screen-section corkboard p-6 justify-between relative overflow-hidden">
-            <!-- 어두운 조명 효과 -->
             <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(0,0,0,0)_0%,rgba(0,0,0,0.85)_100%)] pointer-events-none z-0"></div>
             
-            <!-- 빨간 줄 배경 장식 (수사 보드 느낌) -->
             <svg class="absolute inset-0 w-full h-full pointer-events-none z-0 opacity-40">
                 <line x1="0%" y1="10%" x2="100%" y2="80%" stroke="#ef4444" stroke-width="2" stroke-dasharray="8,8" />
                 <line x1="100%" y1="20%" x2="0%" y2="90%" stroke="#ef4444" stroke-width="2" stroke-dasharray="8,8" />
@@ -439,10 +381,7 @@
                 <p class="font-sans text-lg font-bold text-white mt-5 bg-black/50 px-4 py-2 rounded-xl border border-gray-600 inline-block shadow-md break-keep">수색하며 얻은 힌트들을 조합해<br>진짜 범인을 밝혀내세요.</p>
             </div>
 
-            <!-- 둥실둥실 Floating 힌트 버블 영역 -->
-            <div id="floating-hints-container" class="my-auto relative w-full h-72 my-4 z-10">
-                <!-- 동적으로 둥실둥실 힌트 버블 렌더링 -->
-            </div>
+            <div id="floating-hints-container" class="my-auto relative w-full h-72 my-4 z-10"></div>
 
             <div class="bg-[#fdfbf7] p-5 rounded-sm border-2 border-[#d1c9b4] shadow-2xl font-sans z-10 mb-6 relative">
                 <div class="tape w-20 h-6 -top-3 right-6 transform rotate-6"></div>
@@ -476,34 +415,106 @@
             <p class="text-center font-sans text-sm text-gray-500 mb-6">프로그램 발전을 위해 소중한 의견을 남겨주세요.</p>
             
             <form id="survey-form" class="space-y-6 font-sans">
-                <div id="survey-questions-container" class="space-y-5">
-                    <!-- 동적으로 질문 렌더링 -->
-                </div>
+                <div id="survey-questions-container" class="space-y-5"></div>
                 <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 rounded-xl shadow-lg transition text-lg mt-8 transform hover:-translate-y-1">
                     제출하기
                 </button>
             </form>
         </section>
         
-        <!-- 7. 완료 및 재참여 방지 안내 페이지 -->
+        <!-- 7. 완료 페이지 (운영 본부 확인 안내 및 버튼 변경) -->
         <section id="screen-done" class="screen-section bg-white justify-center items-center p-6 text-center">
             <div class="text-7xl mb-6 text-purple-600 animate-bounce-subtle"><i class="fa-solid fa-circle-check"></i></div>
             <h2 class="text-3xl font-bold text-gray-800 mb-4">감사합니다!</h2>
-            <div class="bg-purple-50 p-6 rounded-2xl border border-purple-200 max-w-sm w-full shadow-sm mb-6">
-                <p class="font-sans text-lg text-gray-700 font-bold leading-relaxed mb-4">모든 과정이 완료되었습니다.</p>
-                <p class="font-sans text-purple-800 font-bold text-base mb-4 break-keep">시작 부스로 돌아와<br>참여 선물을 받아가 주세요!</p>
-                <div class="bg-purple-100 p-3 rounded-xl text-xs text-purple-900 font-sans font-medium">
-                    ⚠️ 실제 환경에서는 본 체험은 1회만 참여 가능합니다.
-                </div>
+            <div class="bg-purple-50 p-6 rounded-2xl border border-purple-200 max-w-sm w-full shadow-sm mb-6 font-sans">
+                <p class="text-lg text-gray-700 font-bold leading-relaxed mb-4 break-keep">모든 수사 및 설문 과정이<br>성공적으로 완료되었습니다.</p>
+                <p class="text-purple-800 font-bold text-base break-keep leading-relaxed">아래 버튼을 눌러 상품 인증 화면을<br>운영 본부에 보여주세요!</p>
             </div>
             
-            <!-- 테스트를 위한 재시작 버튼 -->
-            <button class="btn-replay w-full max-w-sm bg-gray-800 hover:bg-gray-900 text-white font-bold py-4 rounded-2xl shadow-lg transition font-sans flex items-center justify-center gap-2 transform hover:-translate-y-1">
-                <i class="fa-solid fa-rotate-right"></i> 다시 테스트하기 (메인으로)
+            <!-- 변경된 버튼: 상품 인증 화면으로 이동 -->
+            <button id="btn-go-cert" class="w-full max-w-sm bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 rounded-2xl shadow-xl transition font-sans text-xl flex items-center justify-center gap-2 transform hover:-translate-y-1">
+                <i class="fa-solid fa-award"></i> 운영 본부에서 확인받기
             </button>
         </section>
 
-        <!-- 8. 미션 실패 페이지 -->
+        <!-- 8. 상품 인증 화면 (가독성 및 줄바꿈 최적화) -->
+        <section id="screen-cert" class="screen-section bg-gradient-to-b from-purple-900 via-indigo-900 to-black p-6 justify-center items-center text-center text-white relative">
+            <!-- 캡쳐 요청 상단 뱃지 -->
+            <div class="bg-yellow-400 text-black px-5 py-2.5 rounded-full text-xs md:text-sm font-extrabold font-sans shadow-lg mb-6 animate-pulse border-2 border-black flex items-center gap-2 break-keep">
+                <i class="fa-solid fa-camera text-base shrink-0"></i>
+                <span class="leading-tight">해당 화면을 캡쳐하여 운영 본부에 보여주세요!</span>
+            </div>
+
+            <!-- 인증서 카드 -->
+            <div class="bg-white text-gray-900 p-6 rounded-3xl shadow-2xl border-4 border-yellow-400 max-w-sm w-full relative overflow-hidden font-sans">
+                <!-- 워터마크/스탬프 배경 -->
+                <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl font-extrabold pointer-events-none select-none">
+                    🕵️‍♂️
+                </div>
+
+                <div class="border-b-2 border-dashed border-gray-300 pb-4 mb-4">
+                    <span class="text-xs font-bold text-purple-600 tracking-widest block mb-1">OFFICIAL CERTIFICATE</span>
+                    <h3 class="text-2xl font-black text-gray-800 tracking-tight">명예 탐정 인증서</h3>
+                </div>
+
+                <div class="space-y-3 text-left my-6 bg-purple-50 p-4 rounded-2xl border border-purple-100">
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-500 font-bold shrink-0">탐정 닉네임:</span>
+                        <span id="cert-nickname" class="font-extrabold text-purple-900 text-base truncate ml-2">앨리스</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-500 font-bold shrink-0">연락처 뒷자리:</span>
+                        <span id="cert-phone" class="font-bold text-gray-800">1234</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-500 font-bold shrink-0">검거한 범인:</span>
+                        <span class="font-bold text-red-600">카드 병정</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-500 font-bold shrink-0">인증 상태:</span>
+                        <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded font-extrabold text-xs">수사 및 설문 완료</span>
+                    </div>
+                </div>
+
+                <div class="bg-yellow-100 border border-yellow-300 p-3.5 rounded-xl text-yellow-950 text-xs font-bold leading-relaxed mb-1 break-keep">
+                    🎁 운영 요원에게 이 화면을 보여주시면<br>확인 후 참여 선물을 받으실 수 있습니다!
+                </div>
+            </div>
+
+            <!-- 변경된 확인 완료 버튼 -->
+            <button id="btn-cert-complete" class="mt-8 bg-green-600 hover:bg-green-700 text-white font-bold py-3.5 px-8 rounded-xl text-base font-sans border border-green-500 shadow-xl transition flex items-center justify-center gap-2 transform hover:-translate-y-1 break-keep">
+                <i class="fa-solid fa-circle-check"></i> 확인 완료 (운영요원 확인용)
+            </button>
+        </section>
+
+        <!-- 8-1. 운영요원 비밀번호 확인 모달 -->
+        <div id="staff-pw-modal" class="fixed inset-0 z-[85] hidden flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+            <div id="staff-pw-content" class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl text-center">
+                <div class="text-4xl text-purple-600 mb-2"><i class="fa-solid fa-user-check"></i></div>
+                <h2 class="text-xl text-gray-900 mb-1 font-bold">운영 요원 확인</h2>
+                <p class="text-xs text-gray-500 mb-4 font-sans leading-relaxed break-keep">
+                    운영요원 확인 비밀번호 4자리를 입력해주세요.<br>
+                    <span class="text-red-500 font-bold block mt-1">⚠️ 확인 처리 후에는 재참여가 불가능합니다.</span>
+                </p>
+                <input type="password" pattern="[0-9]*" inputmode="numeric" id="staff-pw-input" maxlength="4" placeholder="비밀번호 입력" class="w-full border-2 border-purple-300 rounded-xl p-3 text-center text-2xl font-bold focus:outline-none focus:border-purple-600 font-sans mb-4 tracking-[0.5em] transition">
+                <div class="flex gap-3">
+                    <button id="btn-close-staff-pw" class="flex-1 bg-gray-200 text-gray-700 rounded-xl p-3 text-sm font-bold hover:bg-gray-300 transition shadow-md font-sans">취소</button>
+                    <button id="btn-confirm-staff-pw" class="flex-1 bg-purple-600 text-white rounded-xl p-3 text-sm font-bold hover:bg-purple-700 transition shadow-md font-sans">확인</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 8-2. 게임 재참여 불가 안내 페이지 -->
+        <section id="screen-blocked" class="screen-section bg-gray-900 justify-center items-center p-6 text-center text-white">
+            <div class="text-7xl mb-6 text-amber-400 animate-bounce-subtle"><i class="fa-solid fa-ban"></i></div>
+            <h2 class="text-3xl font-bold text-amber-400 mb-4">참여 완료된 이벤트</h2>
+            <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 max-w-sm w-full mb-6 font-sans">
+                <p class="text-lg text-gray-200 font-bold leading-relaxed mb-3 break-keep">이미 이벤트 수색 및 상품 수령 확인이 완료되었습니다.</p>
+                <p class="text-xs text-gray-400 break-keep leading-relaxed">본 이벤트는 계정/기기당 1회만 참여 가능합니다.<br>참여해 주셔서 감사합니다!</p>
+            </div>
+        </section>
+
+        <!-- 9. 미션 실패 페이지 -->
         <section id="screen-failed" class="screen-section bg-gray-900 justify-center items-center p-6 text-center">
             <div class="text-7xl mb-6 text-red-500 animate-bounce-subtle"><i class="fa-solid fa-clock"></i></div>
             <h2 class="text-3xl font-bold text-red-500 mb-4">시간 초과</h2>
@@ -511,7 +522,6 @@
                 <p class="font-sans text-lg text-gray-300 font-bold leading-relaxed mb-4 break-keep">제한 시간이 모두 초과되었습니다.<br>아쉽지만 수사는 여기까지입니다.</p>
             </div>
             
-            <!-- 테스트를 위한 재시작 버튼 -->
             <button class="btn-replay w-full max-w-sm bg-gray-700 hover:bg-gray-600 text-white font-bold py-4 rounded-2xl shadow-lg transition font-sans flex items-center justify-center gap-2 transform hover:-translate-y-1">
                 <i class="fa-solid fa-rotate-right"></i> 다시 테스트하기 (메인으로)
             </button>
@@ -528,17 +538,13 @@
                 <div id="modal-emoji" class="text-6xl mb-4 animate-bounce-subtle h-20 flex items-center justify-center"><i class="fa-solid fa-magnifying-glass text-purple-300"></i></div>
                 <h2 id="modal-npc-name" class="text-2xl text-purple-900 font-bold mb-4">용의자 이름</h2>
 
-                <!-- Step 1: 최초 대사 화면 -->
                 <div id="modal-step-dialog" class="w-full space-y-4">
-                    <div id="modal-dialog-text" class="w-full bg-purple-50 p-5 rounded-2xl text-sm font-sans text-purple-950 leading-relaxed border border-purple-200 text-center font-bold shadow-inner break-keep">
-                        <!-- 대사 동적 삽입 -->
-                    </div>
+                    <div id="modal-dialog-text" class="w-full bg-purple-50 p-5 rounded-2xl text-sm font-sans text-purple-950 leading-relaxed border border-purple-200 text-center font-bold shadow-inner break-keep"></div>
                     <button id="btn-start-search" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3.5 rounded-xl shadow-lg transition font-sans text-lg flex items-center justify-center gap-2 mt-2 break-keep">
                         <i class="fa-solid fa-magnifying-glass"></i> 용의자 수색하기
                     </button>
                 </div>
 
-                <!-- Step 2: 수색 및 힌트 입력 화면 -->
                 <div id="modal-step-search" class="w-full space-y-4 hidden font-sans">
                     <div class="text-center bg-amber-50 p-4 rounded-2xl border border-amber-200">
                         <h3 id="modal-battle-title" class="text-lg font-extrabold text-amber-900 break-keep">현장 조사 완료!</h3>
@@ -608,7 +614,6 @@
             </div>
 
             <div class="p-4 max-w-lg mx-auto pb-20">
-                <!-- 탭 1: 기본설정 & 설문 -->
                 <div id="admin-tab-config" class="admin-tab-content space-y-6 fade-in">
                     <div class="bg-white p-5 rounded-2xl shadow-sm border-t-4 border-purple-500 font-sans space-y-4">
                         <h2 class="text-lg font-bold text-gray-800">앱 기본 설정</h2>
@@ -635,14 +640,12 @@
                     <button id="btn-save-admin-config" class="w-full bg-green-500 text-white p-3 rounded-xl shadow hover:bg-green-600 font-sans font-bold transition">기본/설문 설정 저장</button>
                 </div>
 
-                <!-- 탭 2: 미션/힌트 수정 -->
                 <div id="admin-tab-stages" class="admin-tab-content hidden space-y-5 fade-in">
                     <p class="text-xs text-gray-500 font-sans bg-white p-3 rounded-xl border">각 용의자의 장소, 대사 및 설정 사항을 수정할 수 있습니다.</p>
                     <div id="admin-stages-container" class="space-y-4"></div>
                     <button id="btn-save-admin-stages" class="w-full bg-green-500 text-white p-3 rounded-xl shadow hover:bg-green-600 font-sans font-bold transition sticky bottom-4 z-10">미션/힌트 설정 저장</button>
                 </div>
 
-                <!-- 탭 3: 통계 및 명단 -->
                 <div id="admin-tab-stats" class="admin-tab-content hidden space-y-6 font-sans fade-in">
                     <div class="flex justify-between items-center">
                         <h2 class="text-lg font-bold text-gray-800">참여자 데이터</h2>
@@ -674,7 +677,7 @@
                     <div class="bg-red-50 p-5 rounded-2xl border border-red-200 mt-8">
                         <h3 class="font-bold text-red-700 mb-2"><i class="fa-solid fa-triangle-exclamation mr-1"></i> 데이터 초기화</h3>
                         <p class="text-xs text-red-600 mb-4 leading-relaxed">모든 참여자 데이터와 수사 기록을 완전히 삭제합니다.</p>
-                        <button id="btn-global-reset" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-xl text-sm shadow transition">모든 데이터 초기화 (현재는 로컬만 적용)</button>
+                        <button id="btn-global-reset" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-xl text-sm shadow transition">모든 데이터 초기화</button>
                     </div>
                 </div>
             </div>
@@ -682,7 +685,6 @@
     </div>
 
     <script type="module">
-        // 기본 게임 설정 데이터
         let gameConfig = {
             title: "이상한 나라의 이 상한 탐정은 충치를 치료하고 싶습니다",
             timerMinutes: 60,
@@ -693,16 +695,15 @@
             ]
         };
 
-        // type 속성 (svg, emoji, image)
+        // 요청해주신 변경 위치 적용 (카니발존 1~4)
         let stagesConfig = [
-            { id: 'stage1', type: 'svg', npc: '애벌레', emoji: '🐛', zone: '버섯 숲', dialog: '누구냐 넌?<br>훔쳐간 지갑? 난 모르는 일이야.', hintRequired: '8624', realHint: '훔지갑' },
-            { id: 'stage2', type: 'emoji', npc: '모자장수', emoji: '🎩', zone: '다과회장', dialog: '차 한잔 할텐가?<br>지갑은 못 봤지만, 바닥에 떨어진 건 봤지.', hintRequired: '8426', realHint: '친짜진' },
-            { id: 'stage3', type: 'emoji', npc: '체셔 고양이', emoji: '😸', zone: '나무 위', dialog: '우후후... 길을 잃었니?<br>범인은 가까운 곳에 있을지도 몰라.', hintRequired: '5123', realHint: '은범인' },
-            { id: 'stage4', type: 'emoji', npc: '하얀 토끼', emoji: '🐇', zone: '시계탑', dialog: '늦었어, 늦었어!<br>지갑 찾을 시간이 어딨어!', hintRequired: '5321', realHint: '정카드' },
-            { id: 'stage5', type: 'emoji', npc: '하트 여왕', emoji: '👑', zone: '여왕의 정원', dialog: '내 장미정원에서 당장 나가라!<br>지갑 따위 알게 뭐냐!', hintRequired: '7895', realHint: '병을' }
+            { id: 'stage1', type: 'svg', npc: '애벌레', emoji: '🐛', zone: '카니발존 4', dialog: '누구냐 넌?<br>훔쳐간 지갑? 난 모르는 일이야.', hintRequired: '8624', realHint: '훔지갑' },
+            { id: 'stage2', type: 'emoji', npc: '모자장수', emoji: '🎩', zone: '카니발존 1', dialog: '차 한잔 할텐가?<br>지갑은 못 봤지만, 바닥에 떨어진 건 봤지.', hintRequired: '8426', realHint: '친짜진' },
+            { id: 'stage3', type: 'emoji', npc: '체셔 고양이', emoji: '😸', zone: '카니발존 2', dialog: '우후후... 길을 잃었니?<br>범인은 가까운 곳에 있을지도 몰라.', hintRequired: '5123', realHint: '은범인' },
+            { id: 'stage4', type: 'emoji', npc: '하얀 토끼', emoji: '🐇', zone: '카니발존 3', dialog: '늦었어, 늦었어!<br>지갑 찾을 시간이 어딨어!', hintRequired: '5321', realHint: '정카드' },
+            { id: 'stage5', type: 'emoji', npc: '하트 여왕', emoji: '👑', zone: '카니발존 4', dialog: '내 장미정원에서 당장 나가라!<br>지갑 따위 알게 뭐냐!', hintRequired: '7895', realHint: '병을' }
         ];
 
-        // 귀여운 캐릭터 SVG 일러스트 생성 함수 (외부 이미지 파일 의존성 제거)
         function getCharacterSvg(npcName, isCleared) {
             const revealedClass = isCleared ? 'revealed animate-bounce-subtle' : 'silhouette';
             if (npcName === '애벌레') {
@@ -743,7 +744,6 @@
             localStorage.setItem('alice_stages', JSON.stringify(stagesConfig));
         }
 
-        // --- 2. Initializing Data from LocalStorage (Fallback DB) ---
         function loadStorageData() {
             const savedConfig = localStorage.getItem('alice_config');
             if (savedConfig) gameConfig = JSON.parse(savedConfig);
@@ -751,14 +751,10 @@
             const savedStages = localStorage.getItem('alice_stages');
             if (savedStages) {
                 stagesConfig = JSON.parse(savedStages);
-                // 기존 브라우저에 저장된 깨진 이미지 설정 복구
                 const caterpillar = stagesConfig.find(s => s.id === 'stage1' || s.npc === '애벌레');
-                if (caterpillar) {
-                    caterpillar.type = 'svg';
-                }
+                if (caterpillar) caterpillar.type = 'svg';
             }
             
-            // Apply config to UI instantly
             document.title = gameConfig.title;
             let displayTitle = gameConfig.title;
             if(gameConfig.title === "이상한 나라의 이 상한 탐정은 충치를 치료하고 싶습니다") {
@@ -767,19 +763,15 @@
             document.getElementById('entry-title').innerHTML = displayTitle;
         }
 
-        // --- 3. UI Helpers & Animations ---
         function showScreen(screenId) {
-            // Remove active and fade classes from all
             document.querySelectorAll('.screen-section').forEach(el => {
                 el.classList.remove('active', 'screen-fade-in');
             });
-            // Add to target
             const target = document.getElementById(screenId);
             target.classList.add('active', 'screen-fade-in');
             window.scrollTo(0, 0);
         }
 
-        // Animated Modal Open/Close Logic
         function openModalAnim(modalId, contentId) {
             const modal = document.getElementById(modalId);
             const content = document.getElementById(contentId);
@@ -795,7 +787,7 @@
             content.classList.add('modal-exit');
             setTimeout(() => {
                 modal.classList.add('hidden');
-            }, 300); // Wait for animation to finish
+            }, 300);
         }
 
         function showAlert(msg, isError = false) {
@@ -825,8 +817,6 @@
             if (confirmCallback) confirmCallback();
         });
 
-        // --- 4. Game Flow Logic ---
-        
         document.getElementById('entry-form').addEventListener('submit', (e) => {
             e.preventDefault();
             currentUser.nickname = document.getElementById('entry-nickname').value.trim();
@@ -843,9 +833,9 @@
         });
 
         function startGameFlow() {
-            const gameTitleEl = document.getElementById('game-title');
-            if (gameTitleEl) {
-                gameTitleEl.innerHTML = `<i class="fa-solid fa-user-secret"></i> ${gameConfig.title}`;
+            if (localStorage.getItem('alice_completed') === 'true') {
+                showScreen('screen-blocked');
+                return;
             }
             document.getElementById('kakao-link').href = gameConfig.kakaoUrl;
             
@@ -856,19 +846,6 @@
             startTimer();
             showScreen('screen-map');
         }
-
-        // Test Replay Feature (Bypasses entry info)
-        document.querySelectorAll('.btn-replay').forEach(btn => {
-            btn.addEventListener('click', () => {
-                // Reset state
-                currentUser.clearedStages = [];
-                currentUser.collectedHints = [];
-                if(gameInterval) clearInterval(gameInterval);
-                
-                // Restart immediately to the map
-                startGameFlow();
-            });
-        });
 
         function startTimer() {
             const timerEl = document.getElementById('game-timer');
@@ -893,7 +870,7 @@
                 
                 timerEl.innerText = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
                 
-                if (distance < 300000) { // Warning under 5 mins
+                if (distance < 300000) {
                     timerEl.parentElement.classList.add('timer-warning');
                 }
             }, 1000);
@@ -903,7 +880,6 @@
             const wrapper = document.getElementById('stages-wrapper');
             wrapper.innerHTML = '';
             
-            // Find the index of the next available mission
             const nextMissionIndex = stagesConfig.findIndex(s => !currentUser.clearedStages.includes(s.id));
             
             stagesConfig.forEach((stage, index) => {
@@ -919,12 +895,11 @@
                 card.style.transform = `rotate(${rotation}deg)`;
                 card.onclick = () => openMissionModal(stage.id);
                 
-                // 캐릭터 아이콘 렌더링 (SVG / 이모지 / 이미지)
                 let iconHtml = '';
                 if (stage.type === 'svg' || stage.npc === '애벌레') {
                     iconHtml = getCharacterSvg(stage.npc, isCleared);
                 } else if (stage.type === 'image' && stage.imgUrl) {
-                    iconHtml = `<img src="${stage.imgUrl}" alt="${stage.npc}" onerror="this.onerror=null; this.outerHTML='${getCharacterSvg(stage.npc, isCleared).replace(/'/g, "\\'")}';" class="npc-icon ${isCleared ? 'revealed animate-bounce-subtle' : 'silhouette'} transition-all duration-500 rounded-lg">`;
+                    iconHtml = `<img src="${stage.imgUrl}" alt="${stage.npc}" class="npc-icon ${isCleared ? 'revealed animate-bounce-subtle' : 'silhouette'} transition-all duration-500 rounded-lg">`;
                 } else {
                     iconHtml = `<span class="text-5xl ${isCleared ? 'revealed animate-bounce-subtle' : 'silhouette'} transition-all duration-500">${stage.emoji}</span>`;
                 }
@@ -941,7 +916,6 @@
                     </div>
                 `;
                 
-                // Add floating magnifying glass to the current active mission
                 if (isCurrent) {
                     html += `<div class="absolute -top-5 -right-5 text-4xl mag-glass-anim drop-shadow-xl z-50">🔍</div>`;
                 }
@@ -978,7 +952,6 @@
                 line.setAttribute("stroke-dasharray", "6,6");
                 line.setAttribute("opacity", "0.6");
                 
-                // Animate drawing the line
                 line.innerHTML = `<animate attributeName="stroke-dashoffset" from="100" to="0" dur="1s" fill="freeze" />`;
                 svg.appendChild(line);
             }
@@ -1001,19 +974,16 @@
             
             document.getElementById('modal-zone').innerText = stage.zone;
             
-            // 모달 안 캐릭터 그래픽 렌더링
             const modalEmojiContainer = document.getElementById('modal-emoji');
             if (stage.type === 'svg' || stage.npc === '애벌레') {
                 modalEmojiContainer.innerHTML = getCharacterSvg(stage.npc, true);
             } else if (stage.type === 'image' && stage.imgUrl) {
-                modalEmojiContainer.innerHTML = `<img src="${stage.imgUrl}" alt="${stage.npc}" onerror="this.onerror=null; this.outerHTML='${getCharacterSvg(stage.npc, true).replace(/'/g, "\\'")}';" class="npc-icon-large drop-shadow-md rounded-2xl">`;
+                modalEmojiContainer.innerHTML = `<img src="${stage.imgUrl}" alt="${stage.npc}" class="npc-icon-large drop-shadow-md rounded-2xl">`;
             } else {
                 modalEmojiContainer.innerHTML = stage.emoji;
             }
             
             document.getElementById('modal-npc-name').innerText = stage.npc;
-            
-            // 대사 출력 (설정된 대사 포함)
             document.getElementById('modal-dialog-text').innerHTML = `<p class="mb-3 break-keep">"${stage.dialog}"</p><p class="text-purple-700 bg-purple-100 py-3 px-4 rounded-xl text-xs break-keep leading-relaxed shadow-sm">💡 <b>${stage.npc}</b>을(를) 발견했다!<br>혹시 얘가 범인?<br>"네가 지갑을 훔쳤지!"라고 외쳐보자!</p>`;
             document.getElementById('modal-battle-title').innerHTML = `용의자 <b>${stage.npc}</b>을/를 이기고<br>힌트를 얻으세요!`;
             
@@ -1029,7 +999,6 @@
         });
         
         document.getElementById('btn-start-search').addEventListener('click', () => {
-            // Add a small fade effect for the inner step switch
             const dialogStep = document.getElementById('modal-step-dialog');
             const searchStep = document.getElementById('modal-step-search');
             
@@ -1062,7 +1031,6 @@
             
             closeModalAnim('mission-modal', 'mission-modal-content');
             
-            // Smooth map update
             setTimeout(() => {
                 renderMap();
                 if (currentUser.clearedStages.length === stagesConfig.length) {
@@ -1079,7 +1047,6 @@
             const container = document.getElementById('floating-hints-container');
             container.innerHTML = '';
             
-            // 흩어지도록 기본 좌표 지정
             const positions = [
                 { top: 15, left: 15 },
                 { top: 60, left: 65 },
@@ -1096,11 +1063,9 @@
                 const left = pos.left + (Math.random() * 15 - 7.5);
                 const delay = Math.random() * 2;
                 
-                // 무작위 크기 및 회전
-                const scale = 0.9 + (Math.random() * 0.6); // 0.9 ~ 1.5
+                const scale = 0.9 + (Math.random() * 0.6);
                 const rotation = Math.random() * 20 - 10;
                 
-                // 폴라로이드/메모지 스타일로 변경
                 bubble.className = `absolute bg-[#fdfbf7] text-gray-900 font-bold font-handwriting px-4 py-2 shadow-lg border border-[#d1c9b4] animate-float z-10 flex flex-col items-center justify-center break-keep text-center whitespace-nowrap`;
                 bubble.style.top = `${top}%`;
                 bubble.style.left = `${left}%`;
@@ -1118,7 +1083,6 @@
 
         document.getElementById('btn-check-culprit').addEventListener('click', () => {
             const inputVal = document.getElementById('final-culprit-input').value.trim().replace(/\s+/g, '');
-            // 정답 하드코딩 혹은 추후 어드민에서 설정하도록 확장 가능
             if(inputVal === "카드병정") {
                 clearInterval(gameInterval);
                 document.getElementById('hq-culprit-name').innerText = "카드 병정";
@@ -1146,36 +1110,61 @@
         document.getElementById('survey-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            // 데이터 수집
             const answers = Array.from(document.querySelectorAll('.survey-answer')).map(el => el.value);
             const userRecord = { ...currentUser, answers, timestamp: new Date().getTime() };
             
             let savedToFirebase = false;
             
-            // 파이어베이스가 초기화되어 있는 경우 Firestore에 저장
             if (typeof window.firebaseDb === 'function' && window.firebaseDb() && typeof window.firebaseAddDoc === 'function') {
                 try {
                     const dbInstance = window.firebaseDb();
                     await window.firebaseAddDoc(window.firebaseCollection(dbInstance, "users"), userRecord);
-                    console.log("파이어베이스에 데이터가 성공적으로 저장되었습니다!");
                     savedToFirebase = true;
                 } catch(err) {
-                    console.warn("파이어베이스 저장 실패, 로컬 스토리지로 저장합니다:", err);
+                    console.warn("파이어베이스 저장 실패, 로컬 스토리지 사용:", err);
                 }
             }
             
-            // 파이어베이스 미사용 또는 실패 시 로컬 스토리지에 백업 저장
             if (!savedToFirebase) {
                 let allUsers = JSON.parse(localStorage.getItem('alice_users') || '[]');
                 allUsers.push(userRecord);
                 localStorage.setItem('alice_users', JSON.stringify(allUsers));
-                console.log("로컬 스토리지에 데이터가 성공적으로 저장되었습니다.");
             }
             
             showScreen('screen-done');
         });
 
-        // --- 5. Admin Logic ---
+        // 1번 요청: 운영 본부에서 확인받기 버튼 누르면 상품 인증 화면 표시
+        document.getElementById('btn-go-cert').addEventListener('click', () => {
+            document.getElementById('cert-nickname').innerText = currentUser.nickname || "탐정";
+            document.getElementById('cert-phone').innerText = currentUser.phone || "0000";
+            showScreen('screen-cert');
+        });
+
+        // 운영 요원 '확인 완료' 처리 기능
+        document.getElementById('btn-cert-complete').addEventListener('click', () => {
+            document.getElementById('staff-pw-input').value = '';
+            openModalAnim('staff-pw-modal', 'staff-pw-content');
+        });
+
+        document.getElementById('btn-close-staff-pw').addEventListener('click', () => {
+            closeModalAnim('staff-pw-modal', 'staff-pw-content');
+        });
+
+        document.getElementById('btn-confirm-staff-pw').addEventListener('click', () => {
+            const inputPw = document.getElementById('staff-pw-input').value.trim();
+            if (inputPw === "1017") {
+                closeModalAnim('staff-pw-modal', 'staff-pw-content');
+                localStorage.setItem('alice_completed', 'true');
+                setTimeout(() => {
+                    showScreen('screen-blocked');
+                }, 300);
+            } else {
+                showAlert("운영요원 비밀번호가 일치하지 않습니다.", true);
+            }
+        });
+
+        // 관리자 모드 관련
         const ADMIN_PW = "1234";
 
         document.getElementById('btn-admin-login').addEventListener('click', () => openModalAnim('admin-login-modal', 'admin-login-content'));
@@ -1295,7 +1284,6 @@
             let allUsers = [];
             let fetchedFromFirebase = false;
             
-            // 파이어베이스에서 실제 참여자 데이터 불러오기
             if (typeof window.firebaseDb === 'function' && window.firebaseDb() && typeof window.firebaseGetDocs === 'function') {
                 try {
                     const dbInstance = window.firebaseDb();
@@ -1306,7 +1294,7 @@
                     allUsers.sort((a, b) => a.timestamp - b.timestamp);
                     fetchedFromFirebase = true;
                 } catch(err) {
-                    console.warn("파이어베이스 데이터 로드 실패, 로컬 데이터를 불러옵니다:", err);
+                    console.warn("파이어베이스 데이터 로드 실패:", err);
                 }
             }
 
@@ -1364,16 +1352,18 @@
         document.getElementById('btn-global-reset').addEventListener('click', () => {
             showConfirm("최종 경고", "정말 모든 참여자 기록과 설문 데이터를 삭제하시겠습니까?\n삭제된 데이터는 절대 복구할 수 없습니다.", () => {
                 localStorage.removeItem('alice_users');
+                localStorage.removeItem('alice_completed');
                 loadAdminStats();
-                showAlert("모든 참여자 데이터가 초기화되었습니다.");
+                showAlert("모든 참여자 데이터 및 완료 상태가 초기화되었습니다.");
             });
         });
 
-        // Initialize App on Load
         window.addEventListener('DOMContentLoaded', () => {
             loadStorageData();
+            if (localStorage.getItem('alice_completed') === 'true') {
+                showScreen('screen-blocked');
+            }
         });
-
     </script>
 </body>
 </html>
