@@ -561,7 +561,7 @@
         <div id="alert-modal" class="fixed inset-0 z-[70] hidden flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
             <div id="alert-modal-content" class="bg-white rounded-2xl p-6 w-10/12 max-w-xs shadow-xl text-center flex flex-col items-center">
                 <div id="alert-icon" class="text-4xl mb-3 text-red-500"></div>
-                <comment-tag id="5"><p id="alert-message" class="text-lg text-gray-800 font-sans mb-5 font-medium leading-relaxed"></p></comment-tag id="5" text="<p id=&quot;alert-message&quot; class=&quot;text-lg text-gray-800 font-sans mb-5 font-medium leading-relaxed whitespace-pre-wrap&quot;></p>" type="suggestion">
+                <p id="alert-message" class="text-lg text-gray-800 font-sans mb-5 font-medium leading-relaxed whitespace-pre-wrap"></p>
                 <button id="btn-close-alert" class="bg-purple-600 text-white px-6 py-2.5 rounded-xl shadow hover:bg-purple-700 transition font-sans font-bold w-full">확인</button>
             </div>
         </div>
@@ -686,7 +686,7 @@
         let gameConfig = {
             title: "이상한 나라의 이 상한 탐정은 충치를 치료하고 싶습니다",
             timerMinutes: 60,
-            kakaoUrl: "https://open.kakao.com/",
+            kakaoUrl: "https://open.kakao.com/o/s4JuTFRi",
             surveyQuestions: [
                 "오늘 프로그램에서 가장 흥미로웠던 부분은 무엇인가요?",
                 "앞으로 탐정 수사 게임에서 개선했으면 하는 점이 있다면 알려주세요."
@@ -695,11 +695,11 @@
 
         // type 속성 (svg, emoji, image)
         let stagesConfig = [
-            { id: 'stage1', type: 'svg', npc: '애벌레', emoji: '🐛', zone: '카니발존 4', dialog: '누구냐 넌?<br>훔쳐간 지갑? 난 모르는 일이야.', hintRequired: '8624', realHint: '훔지갑' },
-            { id: 'stage2', type: 'emoji', npc: '모자장수', emoji: '🎩', zone: '카니발존 1', dialog: '차 한잔 할텐가?<br>지갑은 못 봤지만, 바닥에 떨어진 건 봤지.', hintRequired: '8426', realHint: '친짜진' },
-            { id: 'stage3', type: 'emoji', npc: '체셔 고양이', emoji: '😸', zone: '카니발존 2', dialog: '우후후... 길을 잃었니?<br>범인은 가까운 곳에 있을지도 몰라.', hintRequired: '5123', realHint: '은범인' },
-            { id: 'stage4', type: 'emoji', npc: '하얀 토끼', emoji: '🐇', zone: '카니발존 3', dialog: '늦었어, 늦었어!<br>지갑 찾을 시간이 어딨어!', hintRequired: '5321', realHint: '정카드' },
-            { id: 'stage5', type: 'emoji', npc: '하트 여왕', emoji: '👑', zone: '카니발존 4', dialog: '내 장미정원에서 당장 나가라!<br>지갑 따위 알게 뭐냐!', hintRequired: '7895', realHint: '병을' }
+            { id: 'stage1', type: 'svg', npc: '애벌레', emoji: '🐛', zone: '버섯 숲', dialog: '누구냐 넌?<br>훔쳐간 지갑? 난 모르는 일이야.', hintRequired: '8624', realHint: '훔지갑' },
+            { id: 'stage2', type: 'emoji', npc: '모자장수', emoji: '🎩', zone: '다과회장', dialog: '차 한잔 할텐가?<br>지갑은 못 봤지만, 바닥에 떨어진 건 봤지.', hintRequired: '8426', realHint: '친짜진' },
+            { id: 'stage3', type: 'emoji', npc: '체셔 고양이', emoji: '😸', zone: '나무 위', dialog: '우후후... 길을 잃었니?<br>범인은 가까운 곳에 있을지도 몰라.', hintRequired: '5123', realHint: '은범인' },
+            { id: 'stage4', type: 'emoji', npc: '하얀 토끼', emoji: '🐇', zone: '시계탑', dialog: '늦었어, 늦었어!<br>지갑 찾을 시간이 어딨어!', hintRequired: '5321', realHint: '정카드' },
+            { id: 'stage5', type: 'emoji', npc: '하트 여왕', emoji: '👑', zone: '여왕의 정원', dialog: '내 장미정원에서 당장 나가라!<br>지갑 따위 알게 뭐냐!', hintRequired: '7895', realHint: '병을' }
         ];
 
         // 귀여운 캐릭터 SVG 일러스트 생성 함수 (외부 이미지 파일 의존성 제거)
